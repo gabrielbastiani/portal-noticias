@@ -6,7 +6,10 @@ const path = require('path');
 
 const app = express();
 
-mongoose.connect('mongodb+srv://root:L7gyihWtUhUVGJCk@cluster0.ux084jk.mongodb.net/?retryWrites=true&w=majority',{useNewUrlParser: true, useUnifiedTopology: true}).then(function(){
+const Posts = require('/Posts.js');
+const { validate } = require('./Posts');
+
+mongoose.connect('mongodb+srv://root:L7gyihWtUhUVGJCk@cluster0.ux084jk.mongodb.net/dankicode?retryWrites=true&w=majority',{useNewUrlParser: true, useUnifiedTopology: true}).then(function(){
     console.log('Conectado com sucesso');
 }).catch(function(err){
     console.log(err.message);
@@ -26,7 +29,20 @@ app.set('views', path.join(__dirname, '/pages'));
 app.get('/',(req,res)=>{
     
     if(req.query.busca == null){
-        res.render('home',{});
+        Posts.find({}).sort({'_id':-1}).exec(function(err,posts){
+            posts = posts.map(function(val){
+                return {
+                    titulo: val.titulo,
+                    conteudo: val.conteudo,
+                    descricaoCurta: val.conteudo.substr(0,100),
+                    imagem: val.imagem,
+                    slug: val.slug,
+                    categoria: val.categoria
+                }
+            })
+            res.render('home',{posts:posts});
+        })
+        
     }else{
         res.render('busca',{});
     }

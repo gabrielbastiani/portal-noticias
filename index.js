@@ -6,10 +6,9 @@ const path = require('path');
 
 const app = express();
 
-const Posts = require('/Posts.js');
-const { validate } = require('./Posts');
+const Posts = require('./Posts.js');
 
-mongoose.connect('mongodb+srv://root:L7gyihWtUhUVGJCk@cluster0.ux084jk.mongodb.net/dankicode?retryWrites=true&w=majority',{useNewUrlParser: true, useUnifiedTopology: true}).then(function(){
+mongoose.connect('mongodb+srv://root:L7gyihWtUhUVGJCk@cluster0.ux084jk.mongodb.net/?retryWrites=true&w=majority',{useNewUrlParser: true, useUnifiedTopology: true}).then(function(){
     console.log('Conectado com sucesso');
 }).catch(function(err){
     console.log(err.message);
@@ -29,16 +28,18 @@ app.set('views', path.join(__dirname, '/pages'));
 app.get('/',(req,res)=>{
     
     if(req.query.busca == null){
-        Posts.find({}).sort({'_id':-1}).exec(function(err,posts){
+        Posts.find({}).sort({'_id': -1}).exec(function(err,posts){
+           // console.log(posts[0]);
             posts = posts.map(function(val){
-                return {
-                    titulo: val.titulo,
-                    conteudo: val.conteudo,
-                    descricaoCurta: val.conteudo.substr(0,100),
-                    imagem: val.imagem,
-                    slug: val.slug,
-                    categoria: val.categoria
-                }
+                    return {
+                        titulo: val.titulo,
+                        conteudo: val.conteudo,
+                        descricaoCurta: val.conteudo.substr(0,100),
+                        imagem: val.imagem,
+                        slug: val.slug,
+                        categoria: val.categoria
+                        
+                    }
             })
             res.render('home',{posts:posts});
         })
